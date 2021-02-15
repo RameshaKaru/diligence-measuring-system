@@ -1,0 +1,114 @@
+# configuration file
+
+# Change the below 2 fields every month. Others can be kept unchanged.
+# months to be considered in raw data. This has to be changed whenever the script is executed each month
+months: ['01-Jan-2020', '01-Feb-2020', '01-Mar-2020', '01-May-2020', '01-Jun-2020',
+         '01-Jul-2020', '01-Aug-2020', '01-Sep-2020', '01-Oct-2020', '01-Nov-2020', '01-Dec-2020', '01-Jan-2021']
+# directory with the raw data percentages of all the months above
+location: "input_data/"
+
+# location and name of the clustering history file. It should be in the same folder
+clustering_history: 'clustering_history.csv'
+# after how many months re-clustering should be done
+# put 0 if it needs to be immediately re-clustered
+reclustering_months: 3
+# number of clusters
+num_clusters: 4
+
+# how the ANMs with low patients should be filtered out
+# ANMs who have patients less than threshold_each in each month for each short_rule and ANMs who have patients less
+# than threshold_all * number of months in each short_rule is filtered out as noisy ANMs
+filtering:
+  threshold_each: 8
+  threshold_all: 3
+
+# rule_ignore_std- Rules with standard deviation less than the below provided threshold will be considered as
+# less important rules and will be excluded from the cluster explanations
+# hyperplane_tree- whether to draw hyperplane tree or not
+explain:
+  rule_ignore_std: 10
+  hyperplane_tree: True
+
+# num_rules: 11 (as of 12/02/2021)
+# short term rules
+# name- name of the rule, file_name- file with the raw data related to the rule,
+# col_name- column in the raw data file with percentages, col_name_num_patients- column in raw data file with the number of patients
+# good_range- the range in which the percentages related to the rule are considered good (accepted types: lower, higher, mid)
+# if the good_range is mid, provide the start and end of the range
+short_rules:
+  - name: "Blood_pressure_rule"
+    description: 'proportion of 120/80, 110/70 blood pressure readings being high is suspicious'
+    file_name: "Merged_ADQC_Analysis_Merged_BP_Rule_120_80_110_70.csv"
+    col_name: 'proportion_of_120/80_110/70_subcenter_level'
+    col_name_num_patients: 'Total_BP_assigned_by_the_ANM_subcenter_level'
+    good_range: "lower"
+  - name: "Hypertension_rule"
+    description: 'proportion of hypertension blood pressure readings being low is suspicious'
+    file_name: "Merged_ADQC_Analysis_Merged_BP_Hypertension_Rule.csv"
+    col_name: 'proportion_of_Hypertension_subcenter_level'
+    col_name_num_patients: 'Total_BP_assigned_by_the_ANM_subcenter_level'
+    good_range: "higher"
+  - name: "Urine_rule"
+    description: 'proportion of urine readings as absent being high is suspicious'
+    file_name: "Merged_ADQC_Analysis_Merged_Urine_Absent_Test.csv"
+    col_name: 'proportion_of_UrineTest_Absent_subcenter_level'
+    col_name_num_patients: 'Total_Urine_assigned_by_the_ANM_subcenter_level'
+    good_range: "lower"
+  - name: "Anaemia_rule"
+    description: 'proportion of haemoglobin readings below 11 being at extremes is suspicious'
+    file_name: "Merged_ADQC_Analysis_Merged_Anemic_Less_Than_11_Rule.csv"
+    col_name: 'proportion_of_Anemic_LessThan_11_subcenter_level'
+    col_name_num_patients: 'Total_HB_assigned_by_the_ANM_subcenter_level'
+    good_range: "mid"
+    range:
+      start: 50
+      end: 70
+  - name: "Severe_anaemia_rule"
+    description: 'proportion of haemoglobin readings below 7 being low is suspicious'
+    file_name: "Merged_ADQC_Analysis_Merged_Anemic_Less_Than_7_Rule.csv"
+    col_name: 'proportion_of_Anemic_LessThan_7_subcenter_level'
+    col_name_num_patients: 'Total_HB_assigned_by_the_ANM_subcenter_level'
+    good_range: "higher"
+
+# contradiction rules
+contra_rules:
+  - name: "Blood_pressure_contradiction_rule"
+    description: 'Recording no equipment for some patients while recording blood pressure data for other patients is suspicious'
+    file_name: "Merged_ADQC_Analysis_Merged_No_Equipment_BP_Test.csv"
+    col_name: 'proportion_of_no_equipment_subcenter_level'
+    good_range: "lower"
+  - name: "Weight_contradiction_rule"
+    description: 'Recording no equipment for some patients while recording weight data for other patients is suspicious'
+    file_name: "Merged_ADQC_Analysis_Merged_No_Equipment_Weight_Test.csv"
+    col_name: 'proportion_of_no_equipment_subcenter_level'
+    good_range: "lower"
+  - name: "Haemoglobin_contradiction_rule"
+    description: 'Recording no equipment for some patients while recording haemoglobin data for other patients is suspicious'
+    file_name: "Merged_ADQC_Analysis_Merged_No_Equipment_HB_Test.csv"
+    col_name: 'proportion_of_no_equipment_subcenter_level'
+    good_range: "lower"
+  - name: "Blood_sugar_contradiction_rule"
+    description: 'Recording no equipment for some patients while recording blood sugar data for other patients is suspicious'
+    file_name: "Merged_ADQC_Analysis_Merged_No_Equipment_Blood_Sugar_Test.csv"
+    col_name: 'proportion_of_no_equipment_subcenter_level'
+    good_range: "lower"
+  - name: "Fetal_heart_rate_contradiction_rule"
+    description: 'Recording no equipment for some patients while recording fetal heart rate data for other patients is suspicious'
+    file_name: "Merged_ADQC_Analysis_Merged_No_Equipment_Heart_Rate_Test.csv"
+    col_name: 'proportion_of_no_equipment_subcenter_level'
+    good_range: "lower"
+  - name: 'Urine_contradiction_rule'
+    description: 'Recording no equipment for some patients while recording urine data for other patients is suspicious'
+    file_name: "Merged_ADQC_Analysis_Merged_No_Equipment_Urine_Test.csv"
+    col_name: 'proportion_of_no_equipment_subcenter_level'
+    good_range: "lower"
+
+# hyperplane tree hyperparameter tuning starting point (Do not change. Only for debugging)
+tree_param:
+  a: 500
+  b: 10
+  c: 500
+  t1: 0.05
+  t2: 5
+  allowed_mistake_proportion: 0.1
+  min_levels: 3
