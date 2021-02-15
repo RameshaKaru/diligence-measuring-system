@@ -68,9 +68,10 @@ class ProcessOutputData:
         # display_clusters = get_clust_mean(clust_norm)
         display_clusters = self.sort_clusters()
         self.print_display_cluster_centers(display_clusters)
+        display_clusters_t = np.argsort(display_clusters)
 
         for k in range(len(self.processInput.anm_id)):
-            anm_clust_display.append(np.take(display_clusters, anm_clust[k]))
+            anm_clust_display.append(np.take(display_clusters_t, anm_clust[k]))
 
         for k in range(len(self.processInput.anm_id)):
             anm_mon_display.append(np.take(months_labels, anm_mon[k]))
